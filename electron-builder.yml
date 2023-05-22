@@ -1,0 +1,35 @@
+directories:
+  output: ./release
+appId: org.pdf.2image
+asarUnpack:
+  - '**/*.node'
+buildDependenciesFromSource: true
+npmRebuild: true
+productName: Pdf2Image
+icon: resources/img/favicon.ico
+afterPack: build/hooks/afterPack.js
+nsis:
+  installerIcon: resources/img/favicon.ico
+  uninstallerIcon: resources/img/favicon.ico
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  warningsAsErrors: false
+  installerLanguages  : zh-CN #zh-CN en_US 删除其他语言的安装包
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - ia32
+        - x64
+  artifactName: 'Pdf2Image-Setup-${version}-${arch}.exe'
+mac:
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  artifactName: 'PicGo-${version}-${arch}.dmg'
+linux: {}

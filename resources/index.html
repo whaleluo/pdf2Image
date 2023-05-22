@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pdf2Image - Convert Pdf to PNG/JPEG</title>
+    <meta name="description"
+          content="Free, In-browser, Privacy friendly PDF to image convertor. Supports JPG/JPEG,PNG Image file formats">
+        <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <script src="js/pdf.js"></script>
+    <script src="js/pdf-app.js"></script>
+    <link rel="stylesheet" href="css/index.css">
+
+</head>
+
+<body>
+<div class="home_grid">
+    <div class="home_grid_item params_div_container">
+        <div class="params_div">
+            <div style="text-align: center;">
+                <h1 class="title">Pdf2Image</h1>
+                <h6 class="sub-title">pdf文件分割为图片❤️🔒🍐🌶️</h6>
+            </div>
+            <div class="logo" style="text-align: center;">
+                <img style="width: 7vw;margin: 1vmax;" alt="logo" src="img/logo.png">
+            </div>
+            <div class="pdf_params_divs_container">
+                <div class="pdf_params_divs">
+                    <label for="pdf_input">源文件: </label>
+                    <button id="pdf_input_overlay">请选择一个PDF文件</button>
+                    <input id="pdf_input" type="file" accept="application/pdf" style="display:none;">
+                    <output style="font-size: x-small;" id="selected_file_name" for="pdf_input_overlay"></output>
+                </div>
+                <div class="pdf_params_divs">
+                    <label for="output_dir">输出目录: </label>
+                    <button id="output_dir">请选择一个输出目录</button>
+                    <output style="font-size: x-small;" id="output_dir_name" for="output_dir"></output>
+                </div>
+                <div class="pdf_params_divs" style="display: none">
+                    <label for="format_select">输出图像格式: </label>
+                    <select id="format_select">
+                        <option value="image/png" selected>PNG</option>
+                        <option value="image/jpeg">JPEG</option>
+                    </select>
+                </div>
+
+
+                <div class="pdf_params_divs">
+                    <label for="scale_input">转换精度: </label>
+                    <input class="text_input" id="scale_input" type="range" min="0.5" max="15" value="1" step="0.5">
+                    <output style="font-size: small;" id="output_scale_input" for="scale_input">1</output>
+                </div>
+                <div class="pdf_params_divs" style="display: none">
+                    <label for="quality_input">图像质量: </label>
+                    <input class="text_input" id="quality_input" type="range" min="0" max="1" value="0.8" step="0.1">
+                    <output style="font-size: small;" id="output_quality_input" for="quality_input">0.8</output>
+                </div>
+                <div style="text-align: center;">
+                    <button id="convert_pdf">转换PDF为图片</button>
+                </div>
+            </div>
+            <div style="text-align: center;display: none">
+                <img id="gh_logo" src="" alt="Github logo" onclick="window.location= '';">
+            </div>
+        </div>
+    </div>
+    <div class="home_grid_item">
+        <div id="flex_layout">
+            <div id="pdf_preview_container">
+                <iframe id="pdf_preview" src="placeholder/preview.pdf#toolbar=0"></iframe>
+            </div>
+            <div id="acrylic_container">
+                Console <button id="clear_log">clear</button>
+                <div id="log">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="max-width: 0px;max-height: 0px;overflow: hidden;">
+    <canvas id="page_canvas" style="border: 0px solid black; direction: ltr;"></canvas>
+</div>
+
+</body>
+<script src="js/index.js"></script>
+
+</html>

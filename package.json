@@ -1,0 +1,32 @@
+{
+  "name": "Pdf2Image",
+  "version": "1.0.0",
+  "description": "Pdf2Image - Convert Pdf to PNG/JPEG",
+  "main": "dist/main.js",
+  "devDependencies": {
+    "@types/node": "^18.16.1",
+    "@typescript-eslint/eslint-plugin": "^5.59.6",
+    "@typescript-eslint/parser": "^5.59.6",
+    "electron": "^24.1.2",
+    "electron-builder": "^23.6.0",
+    "eslint": "^8.41.0",
+    "rimraf": "^5.0.1",
+    "typescript": "^5.0.4"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "start": "yarn build && electron .",
+    "prestart": "yarn build",
+    "package": "yarn build && electron-builder build",
+    "package-win32": "yarn build && electron-builder -w",
+    "package-darwin": "yarn build && electron-builder -m",
+    "package-linux": "yarn build && electron-builder -l",
+    "postinstall": "electron-builder install-app-deps",
+    "clean": "rimraf ./dist ./release",
+    "lint": "eslint src/**/*.ts --quiet --fix"
+  },
+  "files": [
+    "dist"
+  ]
+}
