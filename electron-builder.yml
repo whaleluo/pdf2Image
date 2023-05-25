@@ -23,13 +23,15 @@ win:
     - target: nsis
       arch:
         - ia32
-        - x64
-  artifactName: 'Pdf2Image-Setup-${version}-${arch}.exe'
+  artifactName: 'Pdf2Image-Setup-${version}.exe'
 mac:
   target:
     - target: dmg
       arch:
         - x64
         - arm64
-  artifactName: 'PicGo-${version}-${arch}.dmg'
-linux: {}
+  artifactName: 'Pdf2Image-${version}-${arch}.dmg'
+publish:
+  provider: github
+  owner: whaleluo
+  repo: pdf2Image
