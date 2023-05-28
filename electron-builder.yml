@@ -31,6 +31,10 @@ mac:
         - x64
         - arm64
   artifactName: 'Pdf2Image-${version}-${arch}.dmg'
+linux:
+  icon: resources/img
+  target:
+    - target: deb
 publish:
   provider: github
   owner: whaleluo

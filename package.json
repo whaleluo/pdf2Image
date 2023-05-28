@@ -4,6 +4,11 @@
   "description": "Pdf2Image - Convert Pdf to PNG/JPEG",
   "main": "dist/main.js",
   "license": "BSD-3-Clause",
+  "author": {
+    "name": "bear",
+    "email": "whaleluo@163.com",
+    "url": "https://github.com/whaleluo"
+  },
   "devDependencies": {
     "@types/node": "^18.16.1",
     "@typescript-eslint/eslint-plugin": "^5.59.6",
@@ -24,7 +29,8 @@
     "package-darwin": "yarn build && electron-builder -m",
     "package-linux": "yarn build && electron-builder -l",
     "postinstall": "electron-builder install-app-deps",
-    "clean": "rimraf ./dist ./release",
+    "clean": "rimraf dist release",
+    "clean-realese":"rimraf -g release/*-unpacked  && rimraf -g release/builder-*  && rimraf dist" ,
     "lint": "eslint src/**/*.ts --quiet --fix"
   },
   "files": [

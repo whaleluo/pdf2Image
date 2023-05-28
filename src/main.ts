@@ -5,7 +5,14 @@ import path from "path";
 const main = {};
 
 // Modules to control application life and create native browser window
-const logoImage = nativeImage.createFromPath(path.join(__dirname, '../resources/img/favicon.ico'))
+let logName = 'favicon.ico'
+if(process.platform === 'linux'){
+    // linux win32 darwin
+    logName = 'favicon_256x256.png';
+}else if(process.platform === 'darwin'){
+    logName = 'favicon_256x256.png';
+}
+const logoImage = nativeImage.createFromPath(path.join(__dirname, `../resources/img/${logName}`))
 function createWindow() {
     ipcMain.handle('select-Directory', (event, args) => {
         const dirs = dialog.showOpenDialogSync(BrowserWindow.fromWebContents(event.sender), {
