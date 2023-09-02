@@ -16,6 +16,7 @@ nsis:
   installerIcon: resources/img/favicon.ico
   uninstallerIcon: resources/img/favicon.ico
   oneClick: false
+  perMachine: true
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
