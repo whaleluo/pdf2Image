@@ -1,6 +1,10 @@
 directories:
   output: ./release
 appId: org.pdf.2image
+protocols:
+  name: pdftoimg
+  schemes:
+    - pdftoimg
 asarUnpack:
   - '**/*.node'
 buildDependenciesFromSource: true
@@ -16,7 +20,8 @@ nsis:
   createDesktopShortcut: true
   createStartMenuShortcut: true
   warningsAsErrors: false
-  installerLanguages  : zh-CN #zh-CN en_US 删除其他语言的安装包
+  installerLanguages: zh-CN #zh-CN en_US 删除其他语言的安装包
+  include: build/installer.nsh
 
 win:
   target:
@@ -33,6 +38,9 @@ mac:
   artifactName: 'Pdf2Image-${version}-${arch}.dmg'
 linux:
   icon: resources/img
+  category: Utility
+  desktop:
+    MimeType: "x-scheme-handler/pdftoimg"
   target:
     - target: deb
 publish:
