@@ -37,6 +37,8 @@ mac:
         - x64
         - arm64
   artifactName: 'Pdf2Image-${version}-${arch}.dmg'
+  extendInfo: # any - The extra entries for Info.plist.
+    CFBundleURLSchemes: 'pdftoimg'
 linux:
   icon: resources/img
   category: Utility
