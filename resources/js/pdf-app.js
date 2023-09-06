@@ -1,5 +1,3 @@
-const fs = require('fs')
-const path = require("path");
 // <script src="js/pdf.js"></script>
 const pdfjsLib = window['pdfjs-dist/build/pdf'];
 // The workerSrc property shall be specified.
@@ -57,16 +55,27 @@ function canvasToNodeBuffer(canvas){
         }, "image/jpeg",1 ); // JPEG at 100% quality
     })
 }
+
+function canvasToArrayBuffer(canvas){
+    return new Promise(resolve => {
+        canvas.toBlob(function(blob){
+            blob.arrayBuffer().then(res=>{
+                resolve(res)
+            })
+        }, "image/jpeg",1 ); // JPEG at 100% quality
+    })
+}
+
 function writeCanvasToFile(canvas, path) {
     return new Promise(async (resolve,reject) => {
-        const buffer = await canvasToNodeBuffer(canvas)
-        fs.writeFile(path,buffer,(err)=>{
-            if(err){
-                reject(err)
-            }else {
-                resolve()
-            }
-        })
+        const arrayBuffer = await canvasToArrayBuffer(canvas)
+        // const buffer = await canvasToNodeBuffer(canvas)
+        try {
+            const res = await window.ipcRenderer.invoke('fs-write-file', {path, arrayBuffer})
+            return resolve(res)
+        } catch (e) {
+            return reject({err: e.message})
+        }
     })
 }
 
@@ -75,15 +84,14 @@ async function pdf2Image(url,dir,canvas,scale) {
     const numPages = pdf.numPages
     // Asynchronous download of PDF
     console.log(`PDF loaded success : ${numPages} page`);
-    fs.mkdirSync(dir,{recursive:true})
+    window.ipcRenderer.sendSync('fs-mkdir-sync',dir)
     for (let num = 1; num <= numPages; num++) {
         const page = await getPage(pdf,num)
         await renderPageToCanvas(page,canvas,scale)
-        await writeCanvasToFile(canvas,path.resolve(dir,`${num}.png`))
+        await writeCanvasToFile(canvas, window.ipcRenderer.sendSync('path-resolve-sync',dir,`${num}.png`))
         console.log(`page ${num} is render ok`);
     }
     console.log(`pdf is handle success: ${dir}`);
-
 }
 
 

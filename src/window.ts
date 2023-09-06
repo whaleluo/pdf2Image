@@ -1,5 +1,6 @@
 import {BrowserWindow} from "electron";
 import {logoImage} from "./util";
+import path from "path";
 
 export function createMainWindow() {
     const mainWindow = new BrowserWindow({
@@ -8,8 +9,10 @@ export function createMainWindow() {
         resizable: true,
         icon: logoImage,
         webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
+            nodeIntegration: false,
+            contextIsolation: true,
+            webviewTag: true,
+            preload:path.resolve(__dirname,'preload.js')
         }
     });
     mainWindow.loadFile('resources/index.html');
