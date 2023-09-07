@@ -1,11 +1,12 @@
 import {app, dialog, MessageBoxOptions, nativeImage} from "electron";
 import {autoUpdater} from "electron-updater";
 import path from "path";
+import {dataKey} from "./enums";
 
 export function handleUrlFromWeb(action: 'firstInstance' | 'secondInstance', argv: string[]) {
     // scheme is xx:[///]*
     const targetUrl = argv.find(item => item.startsWith('pdftoimg:?'))
-    if(!targetUrl) return;
+    if (!targetUrl) return;
     let url = null
     try {
         url = new URL(targetUrl)
@@ -14,7 +15,25 @@ export function handleUrlFromWeb(action: 'firstInstance' | 'secondInstance', arg
         return;
     }
     const {searchParams} = url
+    memory.set(dataKey.StarUrlParams, searchParams)
     console.log('handleUrlFromWeb', searchParams)
+
+}
+
+// 处理不规则URL
+export function handleCustomUrlFromWeb(action: 'firstInstance' | 'secondInstance', argv: string[]) {
+    const reg = /(?<=pdftoimg:[\/]*\?)\S*/g
+    let params
+    for (let i = 0; i < argv.length; i++) {
+        const match = argv[i].match(reg)?.[0]
+        if (match) {
+            params = match
+            break
+        }
+    }
+    if (!params) return;
+    memory.set(dataKey.StarUrlParams, params)
+    console.log('handleUrlFromWeb', params)
 
 }
 
@@ -89,15 +108,24 @@ export async function checkingUpdae() {
     await autoUpdater.checkForUpdates();
 }
 
-let logName = 'favicon.ico'
-if (process.platform === 'linux') {
-    // linux win32 darwin
-    logName = 'favicon_256x256.png';
-} else if (process.platform === 'darwin') {
-    logName = 'favicon_256x256.png';
-}
-export const logoImage = nativeImage.createFromPath(path.join(__dirname, `../resources/img/${logName}`))
+export const logoName = process.platform === 'win32' ? 'favicon.ico' : 'favicon_256x256.png'
+export const logoImage = nativeImage.createFromPath(path.join(__dirname, `../resources/img/${logoName}`))
 
 export function dialogShow(msgOpt: MessageBoxOptions) {
     return dialog.showMessageBox(Object.assign(msgOpt, {icon: logoImage}))
 }
+
+export const memory = (function () {
+    const memoryData = new Map()
+    return {
+        get: (key: string) => {
+            return memoryData.get(key)
+        },
+        set: (key: string, value: any) => {
+            memoryData.set(key, value)
+        },
+        delete: (key: string) => {
+            memoryData.delete(key)
+        }
+    }
+})()

@@ -1,6 +1,6 @@
 import {BrowserWindow} from "electron";
-import {logoImage} from "./util";
-import path from "path";
+import {logoImage, memory} from "./util";
+import {WindowID} from "./enums";
 
 export function createMainWindow() {
     const mainWindow = new BrowserWindow({
@@ -12,9 +12,13 @@ export function createMainWindow() {
             nodeIntegration: false,
             contextIsolation: true,
             webviewTag: true,
-            preload:path.resolve(__dirname,'preload.js')
         }
     });
     mainWindow.loadFile('resources/index.html');
+    memory.set(WindowID.Main, mainWindow.id)
+    mainWindow.on('close', (event) => {
+        event.preventDefault()
+        mainWindow.hide()
+    })
     return mainWindow
 }

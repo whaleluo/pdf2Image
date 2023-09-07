@@ -1,13 +1,28 @@
 import {contextBridge, ipcRenderer} from 'electron'
 
+console.log(window.navigator.userAgent)
+console.log(eval('1+1'))
+window.addEventListener('focus', () => {
+    // @ts-ignore
+    console.log('focus', global.test)
+})
+window.addEventListener("online", (event) => {
+    console.log("You are now connected to the network.");
+});
+window.ononline = (event) => {
+    console.log("You are now connected to the network.");
+};
+window.addEventListener("open", (event) => {
+    console.log("open", event);
+});
 contextBridge.exposeInMainWorld('ipcRenderer', {
     send: (channel: string, data: any) => {
         ipcRenderer.send(channel, data)
     },
     sendSync: (channel: string, ...data: any) => {
-        if(channel?.includes('-sync') && ipcRenderer.sendSync('main-listener-count-sync',channel)>0){
+        if (channel?.includes('-sync') && ipcRenderer.sendSync('main-listener-count-sync', channel) > 0) {
             return ipcRenderer.sendSync(channel, ...data)
-        }else {
+        } else {
             console.warn(`warning: ${channel} may block main process, cancel run!`)
         }
     },

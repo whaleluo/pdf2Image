@@ -1,0 +1,154 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>zoomView</title>
+    <style>
+        body, div, button, input {
+            margin: 0;
+            padding: 0;
+            border: none;
+            box-sizing: border-box;
+        }
+
+        button {
+            -webkit-app-region: no-drag !important;
+        }
+
+        .box {
+            color: #000000;
+            background: #FFFFFF;
+            border: 1px solid #DCDEE2;
+            box-shadow: 0px 8px 20px 0px #13224028;
+            width: 100%;
+            border-radius: 3px;
+            height: 33px;
+            display: flex;
+            padding: 6px 9px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .zoom-text {
+            display: flex;
+            width: 53px;
+            color: #000;
+            font-family: PingFang SC;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 1.6;
+            letter-spacing: 0px;
+            text-align: left;
+        }
+
+        .control-btns {
+            display: flex;
+            width: 130px;
+            justify-content: space-between;
+            padding-left: 12px;
+            align-items: center;
+        }
+
+        button {
+            width: 24px;
+            height: 24px;
+            opacity: .9;
+            position: relative;
+            transition: 0.2s opacity;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            flex-wrap: nowrap;
+        }
+
+        button:hover {
+            opacity: 1;
+            background-color: rgba(0, 0, 0, 0.08);
+        }
+
+        .reset {
+            opacity: 1;
+            width: 50px;
+            height: 27px;
+            border-radius: 3px;
+            background: #FFFFFF;
+            border: 1px solid darkgrey;
+            color: #1966FF;
+            font-family: PingFang SC;
+            font-size: 12px;
+            line-height: 22px;
+            letter-spacing: 0px;
+            text-align: center;
+            cursor: pointer;
+
+        }
+
+        .reset:hover {
+            background-color: white;
+        }
+
+        .minus {
+            font-size: 21px;
+            color: #667083;
+            margin-right: 10px;
+        }
+
+        .plus {
+            transform: rotate(45deg);
+            font-size: 15px;
+            margin-right: 10px;
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="box">
+    <div class="zoom-text">
+        100%
+    </div>
+    <div class="control-btns">
+        <button class="minus">&ndash;</button>
+        <button class="plus">&#10005;</button>
+        <button class="reset">重置</button>
+    </div>
+</div>
+<script>
+    const {ipcRenderer} = require('electron')
+    const btnMinus = document.querySelector(".minus")
+    const btnPlus = document.querySelector(".plus")
+    const btnReset = document.querySelector(".reset")
+    const zoomDom = document.querySelector(".zoom-text")
+    const box = document.querySelector('.box')
+    const zoomAction = (type) => {
+        ipcRenderer.invoke('zoom-action', type)
+    }
+    box.addEventListener('mouseenter', () => {
+        ipcRenderer.invoke('zoom-mouse-action', 'enter')
+    })
+    box.addEventListener('mouseleave', () => {
+        ipcRenderer.invoke('zoom-mouse-action', 'leave')
+    })
+    btnMinus.addEventListener('click', e => {
+        zoomAction('SUBTRACT')
+    })
+    btnPlus.addEventListener('click', e => {
+        zoomAction('ADD')
+    })
+    btnReset.addEventListener('click', e => {
+        zoomAction('RESET')
+    })
+    ipcRenderer.on('zoom-changed', (e, text) => {
+        zoomDom.innerText = text
+    })
+    ipcRenderer.invoke('zoom-factor').then(text => {
+        zoomDom.innerText = text
+    })
+</script>
+</body>
+</html>
