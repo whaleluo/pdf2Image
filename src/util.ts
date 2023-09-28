@@ -1,4 +1,4 @@
-import {app, dialog, MessageBoxOptions, nativeImage} from "electron";
+import {app, dialog, MessageBoxOptions, nativeImage,Tray} from "electron";
 import {autoUpdater} from "electron-updater";
 import path from "path";
 import {dataKey} from "./enums";

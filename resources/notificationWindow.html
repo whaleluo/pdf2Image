@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Notification</title>
+    <style>
+        html,body{
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: lightblue;
+            -webkit-user-select: none;
+
+        }
+        body{
+            display: flex;
+            justify-content: flex-start;
+            background-color: aliceblue;
+        }
+        #icon{
+            width: 100vh;
+            height: 100vh;
+            background-size: contain;
+        }
+        .img{
+            margin-right: 17px;
+        }
+    </style>
+</head>
+<body>
+<div class="img">
+    <div id="icon"></div>
+</div>
+<div class="text">
+    <div id="title"></div>
+    <div id="sub-title"></div>
+    <div id="body"></div>
+</div>
+
+</body>
+<script>
+    const {ipcRenderer} = require('electron')
+    document.body.addEventListener('click',(e)=>{
+        e.stopPropagation()
+        ipcRenderer.invoke('click-from-notification-page','click')
+    })
+    const getParamsFromURL = (url)=>{
+        let u = url.split('?')[1]
+        const params = new URLSearchParams(u)
+        return Object.fromEntries(params.entries())
+    }
+    const params = getParamsFromURL(location.href)
+    if(params.style){
+        const style = document.createElement('style')
+        style.textContent = params.style
+        document.head.appendChild(style)
+    }
+    if(params.title){
+        document.querySelector('#title').textContent = params.title
+    }
+    if(params.subTitle){
+        document.querySelector('#sub-title').textContent = params.subTitle
+    }
+    if(params.body){
+        document.querySelector('#body').textContent = params.body
+    }
+    if(params.icon){
+        document.querySelector('#icon').style = `background-image: url(${params.icon})`
+    }
+</script>
+</html>

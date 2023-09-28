@@ -1,16 +1,6 @@
-import {
-    app,
-    BrowserWindow,
-    dialog,
-    globalShortcut,
-    Menu,
-    MenuItemConstructorOptions,
-    Tray,
-    webContents
-} from 'electron';
-import {logoImage, memory} from "./util";
+import {app, BrowserWindow, dialog, globalShortcut, Menu, MenuItemConstructorOptions, webContents} from 'electron';
+import {logoImage} from "./util";
 import path from "path";
-import {WindowID} from "./enums";
 import ZoomView from "./zoomView";
 import Accelerator = Electron.Accelerator;
 
@@ -190,31 +180,6 @@ export function initMenu() {
     Menu.setApplicationMenu(template && Menu.buildFromTemplate(template))
 }
 
-export function initTray() {
-    let tray: Tray | null = null
-    const icon = logoImage
-    const contextMenu = Menu.buildFromTemplate([
-        {
-            label: '显示',
-            click: () => {
-                BrowserWindow.fromId(memory.get(WindowID.Main))?.show()
-            }
-        },
-        {
-            label: '退出',
-            click: () => {
-                app.exit()
-            }
-        }
-    ])
-    tray = new Tray(icon.resize({width: 16, height: 16}))
-    tray.setToolTip(app.name)
-    tray.setContextMenu(contextMenu)
-    tray.on('click', () => {
-        BrowserWindow.fromId(memory.get(WindowID.Main))?.show()
-    })
-    return tray
-}
 
 export function initErrorHadle(handleBack: (errMsg: string) => any = (errMsg) => {
     dialog.showErrorBox('', errMsg)
@@ -240,6 +205,6 @@ export function initErrorHadle(handleBack: (errMsg: string) => any = (errMsg) =>
     // 异步异常
     process.on('unhandledRejection', (reason) => {
         console.log('unhandledRejection', reason)
-        handleBack.call(null, reason + '')
+        // handleBack.call(null, reason + '')
     })
 }

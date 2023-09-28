@@ -8,11 +8,12 @@ import {
     initGlobalShortcut,
     initMenu,
     initSession,
-    initTray,
     initUserAgent,
     initWebContentsConfig
 } from './initApp'
 import {WindowID} from "./enums";
+import {NotificationWindow} from "./notification";
+import {TrayUtil} from "./tray";
 
 const main = {}
 // (Use `electron --trace-warnings ...` to show where the warning was created)
@@ -30,6 +31,10 @@ if (!gotTheLock) {
     initMenu()
     initGlobalShortcut()
     initWebContentsConfig()
+    NotificationWindow.open = true
+    NotificationWindow.addListener('click', (options) => {
+        console.log('[main] NotificationWindow static click once only',options)
+    })
     app.on('second-instance', (event, argv, workingDirectory, additionalData) => {
         console.log(additionalData)
         // Someone tried to run a second instance, we should focus our window.
@@ -46,7 +51,7 @@ if (!gotTheLock) {
         handleUrlFromWeb('secondInstance', [url])
     })
     app.whenReady().then(() => {
-        initTray()
+        TrayUtil.initTray()
         app.on('activate', function () {
             if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
         });
