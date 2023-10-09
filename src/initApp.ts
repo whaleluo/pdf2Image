@@ -1,5 +1,5 @@
 import {app, BrowserWindow, dialog, globalShortcut, Menu, MenuItemConstructorOptions, webContents} from 'electron';
-import {logoImage} from "./util";
+import {isDownloadLink, logoImage} from "./util";
 import path from "path";
 import ZoomView from "./zoomView";
 import Accelerator = Electron.Accelerator;
@@ -63,6 +63,14 @@ export function initSession() {
         // and just before normal preload scripts run.
         // The same preload will not be added repeatedly
         session.setPreloads([path.resolve(__dirname, 'preload.js')])
+
+        session.on('will-download', (event, item, webContents) => {
+            if (!webContents.getURL()) {
+                // 处理 new Tab 形式的下载
+                const blankWindow = BrowserWindow.fromWebContents(webContents)
+                blankWindow?.close()
+            }
+        })
     })
 }
 
@@ -85,21 +93,56 @@ export function initWebContentsConfig() {
         const type = webContents.getType()
         if (!types.includes(type)) return
         console.log('[web-contents-created]', type, webContents.getURL(), webContents.id, webContents.getTitle())
-        webContents.setWindowOpenHandler(details => {
+        webContents.setWindowOpenHandler((details) => {
             console.log('setWindowOpenHandler', details)
-            return {
-                action: 'allow',
-                outlivesOpener: false,
-                overrideBrowserWindowOptions: {
-                    frame: true,
-                    icon: logoImage,
-                    webPreferences: {
-                        nodeIntegration: false,
-                        contextIsolation: true,
-                        webviewTag: true,
+            //页面打开新窗口的处理逻辑，解决新页面是下载链接的问题，当前页面自己触发的下载不会走这里的逻辑
+            isDownloadLink(details.url).then((res) => {
+                if (res) {
+                    console.log('isDownloadLink', res)
+                    webContents.downloadURL(details.url)
+                } else {
+                    const loadUrlOptions = {
+                        httpreferrer: details.referrer,
+                        postData: details.postBody?.data,
+                        extraHeaders: ``
                     }
+                    if (details.postBody?.contentType) {
+                        loadUrlOptions.extraHeaders += `content-type: ${details.postBody?.contentType}; \n`
+                    }
+                    if (details.postBody?.boundary) {
+                        loadUrlOptions.extraHeaders += `boundary: ${details.postBody?.boundary}; \n`
+                    }
+
+                    new BrowserWindow({
+                        width: 600,
+                        height: 700,
+                        frame: true,
+                        icon: logoImage,
+                        webPreferences: {
+                            nodeIntegration: false,
+                            contextIsolation: true,
+                            webviewTag: true,
+                        }
+                    }).loadURL(details.url, loadUrlOptions)
                 }
+            })
+
+            return {
+                action: 'deny'
             }
+            // return {
+            //     action: 'allow',
+            //     outlivesOpener: false,
+            //     overrideBrowserWindowOptions: {
+            //         frame: true,
+            //         icon: logoImage,
+            //         webPreferences: {
+            //             nodeIntegration: false,
+            //             contextIsolation: true,
+            //             webviewTag: true,
+            //         }
+            //     }
+            // }
         })
         webContents.on('zoom-changed', (event, zoomDirection) => {
             console.log(zoomDirection)

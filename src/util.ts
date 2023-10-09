@@ -1,7 +1,10 @@
-import {app, dialog, MessageBoxOptions, nativeImage,Tray} from "electron";
+import {app, dialog, MessageBoxOptions, nativeImage} from "electron";
 import {autoUpdater} from "electron-updater";
 import path from "path";
 import {dataKey} from "./enums";
+import * as http from "http";
+import * as https from "https";
+import * as url from "url";
 
 export function handleUrlFromWeb(action: 'firstInstance' | 'secondInstance', argv: string[]) {
     // scheme is xx:[///]*
@@ -113,6 +116,40 @@ export const logoImage = nativeImage.createFromPath(path.join(__dirname, `../res
 
 export function dialogShow(msgOpt: MessageBoxOptions) {
     return dialog.showMessageBox(Object.assign(msgOpt, {icon: logoImage}))
+}
+
+/**
+ * Mime 嗅探
+ * Determine whether the URL is a download resource
+ * @param urlString
+ */
+export function isDownloadLink(urlString: string) {
+    return new Promise(resolve => {
+        if (typeof urlString !== "string" || !urlString.startsWith('http')) return resolve('Invalid URL')
+        const request = urlString.startsWith('https') ? https : http
+        const parsedUrl = url.parse(urlString)
+        request.request({
+            hostname: parsedUrl.hostname,
+            port: parsedUrl.port,
+            path: parsedUrl.path,
+            method: 'HEAD',
+            timeout: 2000
+        }, (res) => {
+            const headers = res.headers
+            const contentType = headers['content-type']
+            const contentDisposition = headers['content-disposition']
+            // https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/MIME_types
+            // https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Content-Disposition
+            console.log(urlString,contentType,contentDisposition)
+            if (contentType === "application/octet-stream" || contentDisposition?.includes('attachment')) {
+                return resolve(true)
+            } else {
+                return resolve(false)
+            }
+        }).end()
+
+    })
+
 }
 
 export const memory = (function () {
