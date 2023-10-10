@@ -49,6 +49,9 @@ if (!gotTheLock) {
     initGlobalShortcut()
     initWebContentsConfig()
     NotificationWindow.open = true
+    NotificationWindow.addListener('created',()=>{
+        TrayUtil.flashing()
+    })
     NotificationWindow.addListener('click', (options) => {
         console.log('[main] NotificationWindow static click once only', options)
     })

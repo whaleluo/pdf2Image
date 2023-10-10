@@ -1,6 +1,7 @@
 import {logoImage, memory} from "./util";
 import {app, BrowserWindow, Menu, nativeImage, Tray} from "electron";
 import {WindowID} from "./enums";
+import {NotificationWindow} from "./notification";
 
 export class TrayUtil {
     private static tray: Tray | null = null
@@ -37,6 +38,9 @@ export class TrayUtil {
         this.tray.setToolTip(app.name)
         this.tray.setContextMenu(contextMenu)
         this.tray.on('click', () => {
+            if(this.isFlashing){
+                NotificationWindow.emitLatestClickEventAtWebContents()
+            }
             BrowserWindow.fromId(memory.get(WindowID.Main))?.show()
         })
         return this.tray
@@ -54,6 +58,10 @@ export class TrayUtil {
                 }
                 this.flag ? this.tray.setImage(this.iconEmptyImage) : this.tray.setImage(this.iconImage)
                 this.flag = !this.flag
+                // 当应用聚焦时，托盘停止闪烁
+                if(BrowserWindow.getFocusedWindow()){
+                    this.stopFlashing()
+                }
 
             }, this.intervalTime)
             this.isFlashing = true

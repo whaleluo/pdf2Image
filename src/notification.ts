@@ -61,6 +61,7 @@ export class NotificationWindow extends EventEmitter {
     private static timeout = 5000
     private static pageUrl = path.join(__dirname, `../resources/notificationWindow.html`)
     private static callbackWebContentsId: number
+    private static latest : null | INotificationConstructorOptions = null
     private static queue: NotificationWindow[] = []
     private static queueLimitSize = 2
     public static open = false
@@ -108,6 +109,11 @@ export class NotificationWindow extends EventEmitter {
             this.window?.close()
         }, NotificationWindow.timeout)
         NotificationWindow.queue.push(this)
+        NotificationWindow.latest = this.options
+    }
+
+    public static emitLatestClickEventAtWebContents(){
+        webContents.fromId(this.callbackWebContentsId)?.send('notification-click',(this.latest))
     }
 
     public static addListener(eventName: INotificationEvent, listener: (...args: any[]) => void) {
@@ -130,7 +136,7 @@ export class NotificationWindow extends EventEmitter {
         return this
     }
 
-    public static emit(eventName: INotificationEvent, ...args: any[]): boolean {
+    private static emit(eventName: INotificationEvent, ...args: any[]): boolean {
         const listeners = this.eventMap.get(eventName)
         if (!listeners) return false
         listeners.forEach(listener => listener(args))
@@ -139,10 +145,6 @@ export class NotificationWindow extends EventEmitter {
 
     public static notify(options: INotificationConstructorOptions) {
         return new NotificationWindow(options)
-    }
-
-    public static getAllNotificationWindow = () => {
-        return NotificationWindow.queue
     }
 
     public static fromWindow = (window: BrowserWindow) => {
@@ -235,7 +237,7 @@ export class NotificationWindow extends EventEmitter {
             if (!this.options.silent) {
                 shell.beep()
             }
-            this.emit('created')
+            NotificationWindow.emit('created')
         })
         win.once('close', () => {
             clearTimeout(this.closeTimeoutID)
