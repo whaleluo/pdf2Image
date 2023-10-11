@@ -3,6 +3,7 @@ import {isDownloadLink, logoImage} from "./util";
 import path from "path";
 import ZoomView from "./zoomView";
 import Accelerator = Electron.Accelerator;
+import {FindView} from "./findView";
 
 /**
  * other userAgent update methods has risk
@@ -19,6 +20,7 @@ export function initGlobalShortcut() {
     const CommandOrControl_F12: Accelerator = <Accelerator>"CommandOrControl+F12"
     const CommandOrControl_Eq: Accelerator = <Accelerator>"CommandOrControl+="
     const CommandOrControl_Sub: Accelerator = <Accelerator>"CommandOrControl+-"
+    const CommandOrControl_F: Accelerator = <Accelerator>"CommandOrControl+F"
 
     const Escape: Accelerator = <Accelerator>"Escape"
 
@@ -44,6 +46,9 @@ export function initGlobalShortcut() {
         globalShortcut.register(CommandOrControl_Sub, () => {
             const wc = webContents.getFocusedWebContents()
             ZoomView.getInstance().emit(wc, 'SUBTRACT')
+        })
+        globalShortcut.register(CommandOrControl_F, ()=>{
+            FindView.emit()
         })
 
 
@@ -230,6 +235,7 @@ export function initErrorHadle(handleBack: (errMsg: string) => any = (errMsg) =>
     app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
         event.preventDefault()
         console.log('certificate-error', url, error)
+        // 允许证书错误
         callback(true)
     })
     app.on('render-process-gone', (event, webContents, details) => {

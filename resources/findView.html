@@ -1,0 +1,165 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>findView</title>
+    <style>
+        body, div, button, input {
+            margin: 0;
+            padding: 0;
+            border: none;
+            box-sizing: border-box;
+            color: #667083;
+        }
+
+        button {
+            -webkit-app-region: no-drag !important;
+        }
+
+        .box {
+            color: #000000;
+            background: #FFFFFF;
+            border: 1px solid #DCDEE2;
+            box-shadow: 0px 8px 20px 0px #13224028;
+            width: 100%;
+            border-radius: 3px;
+            height: 33px;
+            display: flex;
+            padding: 6px 9px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-text {
+            display: flex;
+            width: 90px;
+            color: #000;
+            font-family: PingFang SC;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 1.6;
+            letter-spacing: 0px;
+            text-align: left;
+            text-indent: 5px;
+        }
+        .search-text:focus{
+            border: none;
+            outline: none;
+        }
+
+        .control-btns {
+            display: flex;
+            width: 77px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        button {
+            width: 24px;
+            height: 24px;
+            opacity: .9;
+            position: relative;
+            transition: 0.2s opacity;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            flex-wrap: nowrap;
+            font-size: 21px;
+            color: #667083;
+            margin-right: 1px;
+        }
+
+        button:hover {
+            opacity: 1;
+            background-color: rgba(0, 0, 0, 0.08);
+        }
+        .prev,.next{
+            font-size: 15px;
+        }
+        .show-tips{
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <input type="text" class="search-text" value="" autofocus/>
+    <div class="show-tips">
+        <span class="activeMatchOrdinal">0</span>/<span class="matches">0</span>
+    </div>
+    <div class="control-btns">
+        <button class="prev">&#9650;</button>
+        <button class="next">&#9660;</button>
+        <button class="close">&times;</button>
+    </div>
+</div>
+<script>
+    const {ipcRenderer} = require('electron')
+    let inputting = false
+    let findText = ''
+    const inputElement = document.querySelector(".search-text")
+    const btnPrev = document.querySelector(".prev")
+    const btnNext = document.querySelector(".next")
+    const btnClose = document.querySelector(".close")
+    const matchesDom = document.querySelector('.matches')
+    const activeMatchOrdinalDom = document.querySelector('.activeMatchOrdinal')
+
+    btnPrev.addEventListener('click', e => {
+        ipcRenderer.invoke('find-in-page',{text:findText,options:{forward:false,findNext:false}})
+    })
+    btnNext.addEventListener('click', e => {
+        console.log(1)
+        ipcRenderer.invoke('find-in-page',{text:findText,options:{forward:true,findNext:false}})
+    })
+    btnClose.addEventListener('click', e => {
+        ipcRenderer.invoke('close-find-view')
+    })
+
+    const startFind = (value)=>{
+        findText = value
+        if(!value){
+            matchesDom.innerText = "0"
+            activeMatchOrdinalDom.innerText = '0'
+        }
+        ipcRenderer.invoke('find-in-page',{text:findText,options:{forward:false,findNext:true}})
+
+    }
+
+    ipcRenderer.on('found-in-page', (e, {matches,activeMatchOrdinal}) => {
+        matchesDom.innerText = matches?matches:0
+        activeMatchOrdinalDom.innerText = activeMatchOrdinal?activeMatchOrdinal:0
+    })
+
+    document.addEventListener('visibilitychange',e=>{
+        if(document.visibilityState==='visible'){
+            inputElement.focus()
+        }
+    })
+    inputElement.addEventListener('keyup',evt => {
+        if(evt.keyCode === 13) {
+            evt.preventDefault()
+            ipcRenderer.invoke('find-in-page',{text:findText,options:{forward:true,findNext:false}})
+        }
+    })
+    inputElement.addEventListener('input',evt => {
+        if(inputting) return
+        startFind(evt.target.value)
+    })
+    inputElement.addEventListener('compositionstart',evt => {
+        console.log('compositionstart')
+        inputting = true
+    })
+    inputElement.addEventListener('compositionend',evt => {
+        console.log('compositionend')
+        inputting = false
+    })
+
+
+</script>
+</body>
+</html>
