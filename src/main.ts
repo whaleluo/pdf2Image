@@ -1,6 +1,6 @@
 'use strict';
 import {app, BrowserWindow} from "electron";
-import {checkingUpdae, dialogShow, handleUrlFromWeb, memory} from "./util";
+import {dialogShow, handleUrlFromWeb, memory} from "./util";
 import {createMainWindow} from "./window";
 import initChannels from "./channels";
 import {
@@ -14,6 +14,7 @@ import {
 import {WindowID} from "./enums";
 import {NotificationWindow} from "./notification";
 import {TrayUtil} from "./tray";
+import {checkingUpdae} from "./update";
 
 const main = {}
 /***
@@ -49,7 +50,7 @@ if (!gotTheLock) {
     initGlobalShortcut()
     initWebContentsConfig()
     NotificationWindow.open = true
-    NotificationWindow.addListener('created',()=>{
+    NotificationWindow.addListener('created', () => {
         TrayUtil.flashing()
     })
     NotificationWindow.addListener('click', (options) => {
